@@ -1,0 +1,23 @@
+set(SOURCES
+	src/PCH.h
+	src/main.cpp
+	src/Configs.h
+	src/Configs.cpp
+	src/EquipWatcher.h
+	src/EquipWatcher.cpp
+	src/Globals.h
+	src/Globals.cpp
+	src/HitEventWatcher.h
+	src/HitEventWatcher.cpp
+	src/Hooks.h
+	src/Hooks.cpp
+	src/MenuWatcher.h
+	src/MenuWatcher.cpp
+	src/ObjectLoadWatcher.h
+	src/ObjectLoadWatcher.cpp
+	src/PlayerDeathWatcher.h
+	src/PlayerDeathWatcher.cpp
+	src/Types.h
+	src/Utils.h
+	src/Utils.cpp
+)
