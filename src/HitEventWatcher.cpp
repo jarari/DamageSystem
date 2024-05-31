@@ -112,7 +112,7 @@ RE::BSEventNotifyControl HitEventWatcher::ProcessEvent(const RE::TESHitEvent& ev
 				bool hasDeathChance = false;
 				uint16_t chance = 0;
 				if (projType == 0x40000 || projType == 0x80000 || projType == 0x200000) {  //에너지
-					logger::info("Laser projectile with base damage {}", evn.hitdata.calculatedBaseDamage);
+					logger::info("Laser projectile with damage {}", evn.hitdata.calculatedBaseDamage);
 					CartridgeData& gcd = Configs::cartridgeData.at("Laser");
 					if (partFound <= 2) {
 						if (partFound == 1) {  //머리
@@ -136,7 +136,15 @@ RE::BSEventNotifyControl HitEventWatcher::ProcessEvent(const RE::TESHitEvent& ev
 						}
 					}
 				} else {
-					logger::info("Physical projectile with base damage {}", evn.hitdata.calculatedBaseDamage);
+					logger::info("Physical projectile with damage {}", evn.hitdata.calculatedBaseDamage);
+
+					float additionalDamage = 0.f;
+					if (evn.hitdata.damageTypes) {
+						for (auto it = evn.hitdata.damageTypes->begin(); it != evn.hitdata.damageTypes->end(); ++it) {
+							additionalDamage += it->second.f;
+						}
+					}
+					logger::info("Additional damage {}", additionalDamage);
 					RE::ActiveEffectList* aeList = victim->GetActiveEffectList();  //마법 효과 리스트를 가져오는 부분
 					if (aeList) {
 						BleedingData& bld = Configs::bleedingConfigs.at((EFDBodyParts)partFound);
@@ -159,7 +167,7 @@ RE::BSEventNotifyControl HitEventWatcher::ProcessEvent(const RE::TESHitEvent& ev
 									RE::ActiveEffect* ae = it->get();
 									if (ae && !(ae->flags & RE::ActiveEffect::Flags::kInactive) && ae->item == bld.spell) {
 										bleedae = ae;
-										logger::info("%s is already bleeding", Globals::EFDBodyPartsName[partFound].c_str());
+										logger::info("{} is already bleeding", Globals::EFDBodyPartsName[partFound].c_str());
 										break;  //break 걸면 최상단에 있는 출혈만 효과가 강해짐
 									}
 								}
@@ -167,12 +175,12 @@ RE::BSEventNotifyControl HitEventWatcher::ProcessEvent(const RE::TESHitEvent& ev
 								if (bleedae) {
 									bleedae->magnitude -= bleedmag;
 									bleedae->elapsed = 0;
-									logger::info("Current bleeding magnitude %f", bleedae->magnitude * -1.0f);
+									logger::info("Current bleeding magnitude {}", bleedae->magnitude * -1.0f);
 								} else {
 									bld.spell->listOfEffects[0]->data.magnitude = bld.initialDamage + bleedmag;
 									bld.spell->listOfEffects[1]->data.magnitude = bld.initialDamage + bleedmag;
 									bld.spell->Cast(victim, victim, victim, RE::GameVM::GetSingleton()->GetVM().get());
-									logger::info("Bleeding start magnitude %f", bld.initialDamage + bleedmag);
+									logger::info("Bleeding start magnitude {}", bld.initialDamage + bleedmag);
 								}
 							}
 
@@ -193,11 +201,11 @@ RE::BSEventNotifyControl HitEventWatcher::ProcessEvent(const RE::TESHitEvent& ev
 										RE::ActiveEffect* ae = it->get();
 										if (ae && !(ae->flags & RE::ActiveEffect::Flags::kInactive) && ae->item == bld.fractureSpell) {
 											fractureae = ae;
-											logger::info("%s is already Fractured", Globals::EFDBodyPartsName[partFound].c_str());
+											logger::info("{} is already Fractured", Globals::EFDBodyPartsName[partFound].c_str());
 										}
 									}
 									if (!fractureae) {
-										logger::info("%s Fracture Apply", Globals::EFDBodyPartsName[partFound].c_str());
+										logger::info("{} Fracture Apply", Globals::EFDBodyPartsName[partFound].c_str());
 										bld.fractureSpell->Cast(victim, victim, victim, RE::GameVM::GetSingleton()->GetVM().get());
 									}
 								}
