@@ -21,6 +21,10 @@ RE::BSEventNotifyControl HitEventWatcher::ProcessEvent(const RE::TESHitEvent& ev
 			return RE::BSEventNotifyControl::kContinue;
 		}
 
+		if (victim->IsDead(true)) {
+			return RE::BSEventNotifyControl::kContinue;
+		}
+
 		if (evn.hitdata.impactData.collisionObj) {
 			if (!proj || proj->data.objectReference->formType != RE::ENUM_FORM_ID::kPROJ) {
 				return RE::BSEventNotifyControl::kContinue;
@@ -281,7 +285,7 @@ RE::BSEventNotifyControl HitEventWatcher::ProcessEvent(const RE::TESHitEvent& ev
 					std::uniform_int_distribution<uint16_t> dist{ 1, 100 };
 					uint16_t result = dist(e);
 					if (shouldLog) {
-						logger::info("Random Death Avoid Chance {} vs Death Chance {}", chance, result);
+						logger::info("Death Avoid Chance {} vs Death Chance {}", chance, result);
 					}
 					if (result > chance) {
 						Globals::killDeathMarked->Cast(victim, victim, victim, RE::GameVM::GetSingleton()->GetVM().get());
